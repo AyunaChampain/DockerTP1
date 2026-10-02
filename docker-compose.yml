@@ -1,0 +1,43 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    networks:
+      - app-network
+    depends_on:
+      - database
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://database:5432/db
+      - SPRING_DATASOURCE_USERNAME=usr
+      - SPRING_DATASOURCE_PASSWORD=pwd
+    restart: unless-stopped
+
+  database:
+    build:
+      context: ./database
+    networks:
+      - app-network
+    environment:
+      - POSTGRES_DB=db
+      - POSTGRES_USER=usr
+      - POSTGRES_PASSWORD=pwd
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  httpd:
+    build:
+      context: ./httpd
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+networks:
+  app-network:
+
+volumes:
+  pgdata:
