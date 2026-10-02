@@ -1,6 +1,6 @@
 package fr.takima.training.sampleapplication.IT;
 
-import fr.takima.training.simpleapi.SimpleApiApplication;
+import fr.takima.training.simpleapi.SimpleapiApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @AutoConfigureMockMvc
-@SpringBootTest(classes = {SimpleApiApplication.class})
+@SpringBootTest(classes = {SimpleapiApplication.class})
 class StudentControllerTestIT {
 
     @Autowired

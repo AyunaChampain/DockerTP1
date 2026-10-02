@@ -1,9 +1,8 @@
 package fr.takima.training.sampleapplication.IT;
 
-import fr.takima.training.simpleapi.SimpleApiApplication;
+import fr.takima.training.simpleapi.SimpleapiApplication;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
@@ -15,7 +14,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @AutoConfigureMockMvc
-@SpringBootTest(classes = {SimpleApiApplication.class})
+@SpringBootTest(classes = {SimpleapiApplication.class})
 class DepartmentControllerTestIT {
     @Autowired
     private MockMvc mockMvc;
