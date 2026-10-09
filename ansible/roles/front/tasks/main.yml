@@ -1,12 +1,12 @@
 ---
 - name: Run frontend
-  docker_container:
-    name: front
-    image: "{{ dockerhub_user }}/tp-front:latest"
-    pull: true
+  community.docker.docker_container:
+    name: front                     # nom DNS utilisé par le proxy (http://front:80)
+    image: "{{ dockerhub_user }}/tp-devops-front:latest"
+    pull: always
     state: started
-    restart_policy: always
+    restart_policy: unless-stopped
     networks:
-      - name: "{{ docker_network_name }}"
+      - name: "{{ docker_network_name }}"   # aucun port publié : seul le proxy est exposé
   vars:
     ansible_python_interpreter: /opt/docker_venv/bin/python

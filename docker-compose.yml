@@ -1,4 +1,12 @@
 services:
+  front:
+    build:
+      context: ./front
+    networks:
+      - app-network
+    restart: unless-stopped
+
+
   backend:
     build:
       context: ./backend
