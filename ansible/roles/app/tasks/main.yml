@@ -1,0 +1,16 @@
+---
+- name: Run backend API
+  community.docker.docker_container:
+    name: backend                   # le proxy l'appelle via http://backend:8080
+    image: "{{ dockerhub_user }}/tp-devops-backend:latest"
+    pull: always
+    state: started
+    restart_policy: unless-stopped
+    networks:
+      - name: "{{ docker_network_name }}"
+    env:                            # surcharge application.yml (mêmes variables que docker-compose)
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://database:5432/{{ db_name }}"
+      SPRING_DATASOURCE_USERNAME: "{{ db_user }}"
+      SPRING_DATASOURCE_PASSWORD: "{{ db_password }}"
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

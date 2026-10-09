@@ -29,17 +29,71 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-24.04
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Check secrets
-        run: |
-          if [ -z "${{ secrets.DOCKERHUB_USERNAME }}" ]; then echo "USERNAME is empty"; else echo "USERNAME is set"; fi
-          if [ -z "${{ secrets.DOCKERHUB_TOKEN }}" ]; then echo "TOKEN is empty"; else echo "TOKEN is set"; fi
-
-      - name: Build and push backend image
-        uses: docker/build-push-action@v6
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
         with:
           context: ./backend
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-backend:latest
+
+  build-and-push-database:
+    needs: test-backend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./database
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+
+  build-and-push-httpd:
+    needs: test-backend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: ./httpd
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+
+  deploy:
+    needs: [build-and-push-backend, build-and-push-database, build-and-push-httpd]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Ansible
+        run: |
+          pipx install ansible-core
+          ansible-galaxy collection install community.docker
+
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/formation_key
+          chmod 600 ~/.ssh/formation_key
+          ssh-keyscan ayuna.champain.takima.school >> ~/.ssh/known_hosts
+
+      - name: Deploy
+        working-directory: ansible
+        run: |
+          echo "${{ secrets.VAULT_PASSWORD }}" > .vault_pass
+          ansible-playbook -i inventories/setup.yml playbook.yml --vault-password-file .vault_pass
+          rm .vault_pass

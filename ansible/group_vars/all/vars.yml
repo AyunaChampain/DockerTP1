@@ -1,0 +1,5 @@
+dockerhub_user: champaina
+docker_network_name: app-network
+db_name: db
+db_user: usr
+db_password: "{{ vault_db_password }}"

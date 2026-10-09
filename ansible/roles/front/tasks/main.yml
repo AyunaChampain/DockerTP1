@@ -1,0 +1,12 @@
+---
+- name: Run frontend
+  docker_container:
+    name: front
+    image: "{{ dockerhub_user }}/tp-front:latest"
+    pull: true
+    state: started
+    restart_policy: always
+    networks:
+      - name: "{{ docker_network_name }}"
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python

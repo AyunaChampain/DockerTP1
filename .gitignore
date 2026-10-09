@@ -2,3 +2,4 @@
 data/
 target/
 .github/modernize/
+.vault_pass

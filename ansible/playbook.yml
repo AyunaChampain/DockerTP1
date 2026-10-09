@@ -1,0 +1,13 @@
+---
+# Playbook : déploie l'application (Docker, réseau, base, API, proxy)
+# Usage    : ansible-playbook -i inventories/setup.yml playbook.yml --vault-password-file .vault_pass
+- hosts: all
+  gather_facts: true
+  become: true
+
+  roles:
+    - docker
+    - network
+    - database
+    - app
+    - proxy

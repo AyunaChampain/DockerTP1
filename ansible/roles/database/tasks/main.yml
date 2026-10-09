@@ -1,0 +1,18 @@
+---
+- name: Run database
+  community.docker.docker_container:
+    name: database                  # nom DNS dans le réseau : l'API s'y connecte via "database"
+    image: "{{ dockerhub_user }}/tp-devops-database:latest"
+    pull: always                    # re-télécharge l'image à chaque run (latest est mutable)
+    state: started                  # crée et démarre si besoin (idempotent)
+    restart_policy: unless-stopped  # redémarre après un crash ou un reboot du serveur
+    networks:
+      - name: "{{ docker_network_name }}"   # réseau privé, aucun port publié
+    env:                            # config injectée au démarrage
+      POSTGRES_DB: "{{ db_name }}"
+      POSTGRES_USER: "{{ db_user }}"
+      POSTGRES_PASSWORD: "{{ db_password }}"   # secret, vient du vault
+    volumes:
+      - pgdata:/var/lib/postgresql/data        # les données survivent à la recréation du conteneur
+  vars:
+    ansible_python_interpreter: /opt/docker_venv/bin/python
