@@ -8,6 +8,31 @@ on:
   pull_request:
 
 jobs:
+  deploy-backend-ansible:
+    needs: build-and-push-backend
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH and vault
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/formation_key
+          chmod 600 ~/.ssh/formation_key
+          ssh-keyscan ayuna.champain.takima.school >> ~/.ssh/known_hosts
+          echo "${{ secrets.VAULT_PASSWORD }}" > ansible/.vault_pass
+
+      - name: Build Ansible image
+        run: docker build -t ansible-runner ./ansible
+
+      - name: Run playbook (backend only)
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}/ansible:/ansible \
+            -v $HOME/.ssh:/root/.ssh \
+            ansible-runner \
+            -i inventories/setup.yml playbook.yml --tags app
   test-backend:
     runs-on: ubuntu-24.04
     steps:

@@ -6,8 +6,9 @@
   become: true
 
   roles:
-    - docker
-    - network
-    - database
-    - app
-    - proxy
+    - { role: docker,   tags: docker }
+    - { role: network,  tags: network }
+    - { role: database, tags: database }
+    - { role: app,      tags: app }
+    - { role: front,    tags: front }
+    - { role: proxy,    tags: proxy }
