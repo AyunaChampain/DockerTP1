@@ -33,6 +33,7 @@ jobs:
             -v $HOME/.ssh:/root/.ssh \
             ansible-runner \
             -i inventories/setup.yml playbook.yml --tags app
+
   test-backend:
     runs-on: ubuntu-24.04
     steps:
@@ -49,6 +50,7 @@ jobs:
       - name: Build and test with Maven
         run: mvn -B clean verify --file backend/pom.xml
 
+  build-and-push-backend:
     needs: test-backend
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-24.04
