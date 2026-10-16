@@ -8,7 +8,7 @@ on:
   pull_request:
 
 jobs:
-    test-backend:
+  test-backend:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
