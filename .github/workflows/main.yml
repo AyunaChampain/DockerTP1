@@ -104,42 +104,42 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
 
-  deploy:
-    needs: [build-and-push-backend, build-and-push-database, build-and-push-httpd, build-and-push-front]
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
+  #deploy:
+  #  needs: [build-and-push-backend, build-and-push-database, build-and-push-httpd, build-and-push-front]
+  #  if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  #  runs-on: ubuntu-24.04
+  #  steps:
+  #    - uses: actions/checkout@v4
 
-      - name: Install Ansible
-        run: |
-          pipx install ansible-core
-          ansible-galaxy collection install community.docker
+  #    - name: Install Ansible
+  #      run: |
+  #        pipx install ansible-core
+  #        ansible-galaxy collection install community.docker
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/formation_key
-          chmod 600 ~/.ssh/formation_key
-          ssh-keyscan ayuna.champain.takima.school >> ~/.ssh/known_hosts
+  #    - name: Configure SSH
+  #      run: |
+  #        mkdir -p ~/.ssh
+  #        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/formation_key
+  #        chmod 600 ~/.ssh/formation_key
+  #        ssh-keyscan ayuna.champain.takima.school >> ~/.ssh/known_hosts
 
-      - name: Deploy
-        working-directory: ansible
-        run: |
-          echo "${{ secrets.VAULT_PASSWORD }}" > .vault_pass
-          ansible-playbook -i inventories/setup.yml playbook.yml --vault-password-file .vault_pass
-          rm .vault_pass
-  build-and-push-front:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
-        with:
-          context: ./front
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-front:latest
+  #    - name: Deploy
+  #      working-directory: ansible
+  #      run: |
+  #        echo "${{ secrets.VAULT_PASSWORD }}" > .vault_pass
+  #        ansible-playbook -i inventories/setup.yml playbook.yml --vault-password-file .vault_pass
+  #        rm .vault_pass
+  #build-and-push-front:
+  #  if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+  #  runs-on: ubuntu-24.04
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #    - uses: docker/login-action@v3
+  #      with:
+  #        username: ${{ secrets.DOCKERHUB_USERNAME }}
+  #        password: ${{ secrets.DOCKERHUB_TOKEN }}
+  #    - uses: docker/build-push-action@v6
+  #      with:
+  #        context: ./front
+  #        push: true
+  #        tags: ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-front:latest
